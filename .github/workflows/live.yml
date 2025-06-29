@@ -2,9 +2,7 @@ name: Live Stream 24/7 Relay
 
 on:
   schedule:
-    
     - cron: '0 */4 * * *'
-  
   workflow_dispatch:
 
 jobs:
@@ -20,8 +18,6 @@ jobs:
       - name: Iniciar Transmissão da Live
         run: |
           ffmpeg \
-              -loop 1 -r 2 -i "${{ secrets.IMAGE_URL }}" \
-              -stream_loop -1 -re -i "${{ secrets.AUDIO_URL }}" \
-              -c:v libx264 -preset veryfast -tune stillimage -pix_fmt yuv420p -g 4 \
-              -c:a aac -b:a 128k -ar 44100 \
+              -re -stream_loop -1 -i "${{ secrets.VIDEO_URL }}" \
+              -c copy \
               -f flv "${{ secrets.RTMP_URL }}/${{ secrets.STREAM_KEY }}"
