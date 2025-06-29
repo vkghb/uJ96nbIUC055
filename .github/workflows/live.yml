@@ -1,0 +1,27 @@
+name: Live Stream 24/7 Relay
+
+on:
+  schedule:
+    
+    - cron: '0 */4 * * *'
+  
+  workflow_dispatch:
+
+jobs:
+  stream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Instalar FFmpeg
+        run: sudo apt-get update && sudo apt-get install ffmpeg -y
+
+      - name: Iniciar Transmissão da Live
+        run: |
+          ffmpeg \
+              -loop 1 -r 2 -i "${{ secrets.IMAGE_URL }}" \
+              -stream_loop -1 -re -i "${{ secrets.AUDIO_URL }}" \
+              -c:v libx264 -preset veryfast -tune stillimage -pix_fmt yuv420p \
+              -c:a aac -b:a 128k -ar 44100 \
+              -f flv "${{ secrets.RTMP_URL }}/${{ secrets.STREAM_KEY }}"
